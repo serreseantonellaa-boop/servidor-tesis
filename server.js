@@ -142,6 +142,15 @@ servidor.on('connection', function(conexion, request) {
       return;
     }
 
+    // NOTIFICACION: celular → notebook (TODAS las notificaciones, para mostrarlas en pantalla)
+    if (datos.tipo === 'notificacion') {
+      if (clientes.notebook && clientes.notebook.readyState === WebSocket.OPEN) {
+        clientes.notebook.send(JSON.stringify(datos));
+        console.log('NOTIFICACION enviada a la notebook:', datos.nombreApp);
+      }
+      return;
+    }
+
     // Mensaje RESULTADO: la notebook manda los datos finales de la sesión
     if (datos.tipo === 'resultado') {
       guardarResultado(datos.sesion);
