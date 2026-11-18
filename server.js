@@ -151,6 +151,18 @@ servidor.on('connection', function(conexion, request) {
       return;
     }
 
+    // LLAMADA: va en los dos sentidos.
+    // La notebook avisa al celular que entra la llamada de cobranza;
+    // el celular avisa a la notebook cuando la persona la corta.
+    if (datos.tipo === 'llamada') {
+      let destino = (conexion === clientes.celular) ? clientes.notebook : clientes.celular;
+      if (destino && destino.readyState === WebSocket.OPEN) {
+        destino.send(JSON.stringify(datos));
+        console.log('LLAMADA', datos.estado, ':', datos.quien);
+      }
+      return;
+    }
+
     // Mensaje RESULTADO: la notebook manda los datos finales de la sesión
     if (datos.tipo === 'resultado') {
       guardarResultado(datos.sesion);
